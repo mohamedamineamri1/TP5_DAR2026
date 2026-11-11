@@ -2,11 +2,7 @@
 # TP 5 — Invocation de méthodes sur des objets distants avec Java RMI
  
 **Développement d'applications réparties**
- 
-![Java](https://img.shields.io/badge/Java-8%2B-orange?logo=openjdk&logoColor=white)
-![RMI](https://img.shields.io/badge/Java-RMI-blue)
-![JNDI](https://img.shields.io/badge/JNDI-RegistryContextFactory-green)
-![Eclipse](https://img.shields.io/badge/IDE-Eclipse-2C2255?logo=eclipseide&logoColor=white)
+
  
 </div>
 
@@ -126,7 +122,7 @@ Le serveur offre la conversion d'un montant en **euros vers le dinar tunisien**.
 | `rmiClient` | `ConversionClient` | Recherche l'objet (`lookup`) et appelle `convertirMontant(500)` | 
 
  
-### 5.1Exécution  
+### 5.2Exécution  
 <img width="1113" height="366" alt="Capture d&#39;écran 2026-11-11 210452" src="https://github.com/user-attachments/assets/4d75ce43-da59-4be9-9d96-0c22b7a28547" />
 
 <img width="1217" height="541" alt="Capture d&#39;écran 2026-11-11 210506" src="https://github.com/user-attachments/assets/a9dfdeb1-d438-453b-ad52-a78ba5382fdc" />
@@ -140,7 +136,7 @@ Le serveur est lancé en premier, puis le client.
 500 EUR = 1700.0 TND
 ```
  
-### 5.6 Synthèse
+### 5.3 Synthèse
  
 Le client ne connaît que l'interface `IConversion`, fournie par le jar : il ne voit jamais `ConversionImpl`, qui reste sur le serveur. Il obtient un stub depuis le registre RMI, et l'appel de `convertirMontant(500)` est transmis au serveur de façon transparente. Le serveur doit être démarré avant le client, sinon on obtient une `ConnectException`. Le port 1099 ne peut être utilisé que par un seul serveur à la fois.
  
@@ -169,12 +165,12 @@ Un serveur central gère les comptes bancaires. Un **compte** est défini par un
 
  
  
-### 6.4 Exécution avec RMI classique (`Naming`)
+### 6.3 Exécution avec RMI classique
  
 | Console du serveur | Console du client |
 <img width="1026" height="257" alt="Capture d&#39;écran 2026-11-11 211741" src="https://github.com/user-attachments/assets/ac06bb72-6df4-48c3-a1fe-4a702403c2ee" />
 
-### 6.5 Passage à JNDI
+### 6.4 Passage à JNDI
  
 **Fichier `jndi.properties`** (à la racine de `src`, côté serveur **et** côté client) :
  
@@ -204,7 +200,7 @@ IBanque stub = (IBanque) ctx.lookup("BK");
 | Console du serveur (JNDI) | Console du client (JNDI) |
 <img width="1043" height="381" alt="Capture d&#39;écran 2026-11-11 212115" src="https://github.com/user-attachments/assets/e3a548cd-24f2-4a73-967a-9393c667303a" />
 
-### 6.6 Résultats
+### 6.5 Résultats
  
 Le scénario du client crée le compte 1, tente de le recréer, puis consulte un compte existant et un compte inexistant.
  
@@ -217,13 +213,13 @@ Le scénario du client crée le compte 1, tente de le recréer, puis consulte un
  
 Le comportement est **identique** avec RMI classique et avec JNDI : seul le mode d'enregistrement et de recherche change.
  
-### 6.7 Synthèse
+### 6.6 Synthèse
  
 JNDI fournit une interface unique pour accéder à un service d'annuaire : ici, le registre RMI est utilisé via `InitialContext`, sans appeler `Naming` dans le code. Le fichier `jndi.properties` indique la fabrique de contexte et l'URL du fournisseur ; il doit se trouver à la racine de `src` pour être sur le classpath, sinon `NoInitialContextException`. Changer d'annuaire ne demande alors que de modifier ce fichier, pas le code. La classe `Compte` doit être `Serializable` car elle est copiée par valeur entre les deux JVM. Les méthodes du serveur sont `synchronized` pour éviter les accès concurrents à la `HashMap` lorsque plusieurs clients se connectent.
  
 ---
  
-## 9. Conclusion et améliorations
+## 7. Conclusion et améliorations
  
 Ce TP a permis de mettre en œuvre un service distant complet avec RMI, puis de remplacer l'accès direct au registre par JNDI. La séparation entre **interface partagée** (jar client) et **implémentation** (serveur seul) illustre bien le principe des applications réparties.
  
